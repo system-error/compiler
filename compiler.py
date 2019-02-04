@@ -16,7 +16,7 @@ def doTheCooking(identifier,addition):
     text = txt1 + '=' + str(txt2)
     return text
     
-file = open('testfile.texter', 'r') 
+file = open('testfile.nycl', 'r') 
 variables = {}
 identifier = []
 addition = []
