@@ -1,4 +1,3 @@
 # compiler
-A small programming language compiler
-compiler is created in python
-and th file that takes has 
+A small programming language parser/intepreter is created in python
+and the file that takes, has written in NYC programming langauge. 
