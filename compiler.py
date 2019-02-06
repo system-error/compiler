@@ -91,7 +91,7 @@ for text in file:
                 else:    
                     inter.printTheValues(flag)
             elif re.match(regexwrite,text):
-                inter.printTheWriteCommand(text) #solution           
+                inter.printTheWriteCommand(text)          
             else:
                 txt = text.replace(' ','')
                 if '=' in txt:    
