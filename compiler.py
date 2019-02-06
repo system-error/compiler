@@ -1,90 +1,106 @@
-#regular expression for the identifier ^[a-zA-Z_]
-#print kai insert times
-import re,os
+import re,glob,sys
 
-def doTheDictionaryJob(ide,add):
-    for k,v in zip(ide,add):
-            variables[k] = v
-
-def doTheCooking(identifier,addition):
-    identifier.append(txt[0])
-    result = eval((txt[1]))
-    addition.append(result)
-    doTheDictionaryJob(identifier,addition)
-    txt1 = identifier.pop(0)    
-    txt2 = addition.pop(0)
-    text = txt1 + '=' + str(txt2)
-    return text
-    
-file = open('testfile.nycl', 'r') 
 variables = {}
 identifier = []
 addition = []
+writecommand = []
 regexleft = r'^[a-zA-Z_]'
 regexright = r'([0-9]|[0-9]+[\\+\\-\\*\\/]{1}[0-9]+)+([\\+\\-\\*\\/]{1}[0-9]+)*$'
-regexshow = r'^show'
-# regexmid = r'[^\=]'
-for text in file:
-    if text == '\n':
-        continue
-    else:
-        if re.match(regexshow,text):
-            text = text.strip()
-            txt = text.split(' ')
-            if (bool(variables)) == False:
-                print("Undefined variable: \'%s\'" %(txt[1]))
-            else:        
-                for key,value in variables.items():
-                    if key == txt[1]:
-                        print("The value of %s variable is: %s"%(txt[1],value))
-                        break
-                    # else:    
-                    #     print("Undefined variable: \'%s\'" %(txt[1]))
-                if key != txt[1]:
-                    print("Undefined variable: \'%s\'" %(txt[1]))          
-        else:
-            # if re.match(regexeq,text):
-            #     print("Undefined variable:")
-            # else:        
-            txt = text.replace(' ','')
-            txt = txt.split('=')
-            if re.match(regexleft,txt[0]) and re.match(regexright,txt[1]):
-                text = doTheCooking(identifier,addition)  
-                print("The line matches: %s" %(text))  
-            else:
-                print("The line doesn't mach:  %s"%(text))    
-                        
-                     
-# elif re.match(regexeq,check[1]):
-#                 print("Undefined variable: \'%s\'" %(txt[0]))
+regexshow = r'^show+\s{1}'
+regexwrite = r'write+\s{1}\"(.+?)\"'    
+regexmid = r'[\=]'
+#regexmid=r'([=])'
+extention =  glob.glob('*.nycl')
 
-#  check = text.split() 
-# for i in check:
-            #     if i != '=':
-            #         continue
-            #     else: 
-
-
-
-
-
-
-
-
-
-
-#regex = r'^[a-zA-Z_]+(\=)+([0-9]|[0-9]+[\\+\\-\\*\\/]{1}[0-9]+)+([\\+\\-\\*\\/]{1}[0-9]+)*$'
-
-# summary = eval(text)
-    # print (summary) 
- # if re.match(regex,txt):
-    #     txt = txt.split('=')
-    #     identifier.append(txt[0])
-    #     addition.append(eval(txt[1]))
-    #     txt1 = identifier[0]    
-    #     txt2 = addition[0]
-    #     text = txt1 + '=' + str(txt2)
+class Interpreter:
+    def __init__(self):
+        pass
         
-    #     print("The line matches: %s" %(text))
-    # else:
-    #     print("The line doesn't mach:  %s"%(text))
+    def printTheValues(self,theValue):
+        print(theValue)
+
+    def printTheWriteCommand(self,writeText):
+        writeText = writeText.replace('\n','')
+        txt = writeText.split(' ')
+        print(str(txt[1]))
+
+
+inter = Interpreter()
+
+def addToVariables(ide,add):   # take the 2 lists and add them in 1 dictionary    
+    for k,v in zip(ide,add):   # for the variables
+            variables[k] = v
+
+def doTheCooking(identifier,addition,txt): # separate the string i give in the 
+    identifier.append(txt[0])          # file in variables and do the result
+    result = eval((txt[1]))            # bad approach, for now use the eval
+    addition.append(result)
+    addToVariables(identifier,addition)
+    identifier.pop(0)
+    addition.pop(0)
+    # txt1 = identifier.pop(0)    
+    # txt2 = addition.pop(0)
+    # text = txt1 + '=' + str(txt2)
+    # return text
+
+def checkTheCommands(text,variables):
+        text = text.strip()
+        txt = text.split(' ')
+        if (bool(variables)) == False:
+            print("Undefined variable: \'%s\'" %(txt[1]))
+            # sys.exit(None)
+            return False
+        else:        
+            for key,value in variables.items():
+                if key == txt[1]:
+                    theValue = "The value of %s variable is: %s"%(txt[1],value)
+                    return theValue
+                # else:    
+                #     print("Undefined variable: \'%s\'" %(txt[1]))
+            if key != txt[1]:
+                print("Undefined variable: \'%s\'" %(txt[1]))
+                return False
+                    
+
+def checkTheVariables(txt):
+    txt = txt.split('=')
+    if re.match(regexleft,txt[0]) and re.match(regexright,txt[1]):
+            # text = doTheCooking(identifier,addition)
+        doTheCooking(identifier,addition,txt)  
+            #print("The line matches: %s" %(text))  
+    elif(txt[0] == '' or txt[1] == '\n') :
+        print("Syntax error or undefined variable")
+        return False 
+
+def openTheFile(extention):    # takes every file with this extension from    
+    for i in extention:        # the specific folder
+        return i
+
+theFile = openTheFile(extention)   
+file = open('./' + theFile, 'r')
+
+for text in file:
+        if text == '\n':
+            continue
+        else:
+            #temp.append(text.split())
+            if re.match(regexshow,text):
+                flag = checkTheCommands(text,variables) #solution
+                if flag == False:
+                    break
+                else:    
+                    inter.printTheValues(flag)
+            elif re.match(regexwrite,text):
+                inter.printTheWriteCommand(text) #solution           
+            else:
+                txt = text.replace(' ','')
+                if '=' in txt:    
+                    flag = checkTheVariables(txt)
+                    if flag == False:
+                        break
+                elif ('write') or('show') :
+                    print('These name of variable is committed from the system: %s'%text)                     
+                    break
+                else:
+                    print('Undefined variable: %s'%text)
+                    break
