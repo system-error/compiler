@@ -1,5 +1,9 @@
 import re,glob,sys
 
+
+def main():
+    pass
+
 variables = {}
 identifier = []
 addition = []
@@ -78,12 +82,12 @@ def checkTheVariables(txt):
 
 def openTheFile(extention):    # takes every file with this extension from    
     for i in extention:        # the specific folder
-        return i
+        file = open('./' + i, 'r')
+        return file
 
 theFile = openTheFile(extention)   
-file = open('./' + theFile, 'r')
 
-for text in file:
+for text in theFile:
         if text == '\n' or re.match(regexcomm,text):
             continue
         else:
