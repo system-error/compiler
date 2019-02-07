@@ -9,7 +9,8 @@ regexright = r'([0-9]|[0-9]+[\\+\\-\\*\\/]{1}[0-9]+)+([\\+\\-\\*\\/]{1}[0-9]+)*$
 regexshow = r'^show+\s{1}'
 regexwrite = r'write+\s{1}\"(.+?)\"'    
 regexmid = r'[\=]'
-#regexmid=r'([=])'
+regexcomm=r'^#.'
+showwritereg = r'\bshow\b|\bwrite\b'
 extention =  glob.glob('*.nycl')
 
 class Interpreter:
@@ -47,8 +48,11 @@ def checkTheCommands(text,variables):
         text = text.strip()
         txt = text.split(' ')
         if (bool(variables)) == False:
-            print("Undefined variable: \'%s\'" %(txt[1]))
-            # sys.exit(None)
+            if re.match(showwritereg,txt[0]):
+                print("This name of variable is committed from the system: \'%s\'" %(txt[0]))
+            else:
+                print("Undefined variable: \'%s\'" %(txt[1]))        
+            # sys.exit(None)    
             return False
         else:        
             for key,value in variables.items():
@@ -80,7 +84,7 @@ theFile = openTheFile(extention)
 file = open('./' + theFile, 'r')
 
 for text in file:
-        if text == '\n':
+        if text == '\n' or re.match(regexcomm,text):
             continue
         else:
             #temp.append(text.split())
@@ -91,15 +95,15 @@ for text in file:
                 else:    
                     inter.printTheValues(flag)
             elif re.match(regexwrite,text):
-                inter.printTheWriteCommand(text)          
+                inter.printTheWriteCommand(text) #solution           
             else:
                 txt = text.replace(' ','')
                 if '=' in txt:    
                     flag = checkTheVariables(txt)
                     if flag == False:
                         break
-                elif ('write') or('show') :
-                    print('These name of variable is committed from the system: %s'%text)                     
+                elif re.match(showwritereg,text):
+                    print('This name of variable is committed from the system: %s'%text)                     
                     break
                 else:
                     print('Undefined variable: %s'%text)
